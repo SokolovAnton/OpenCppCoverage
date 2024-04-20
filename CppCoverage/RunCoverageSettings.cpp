@@ -68,6 +68,11 @@ namespace CppCoverage
 		optimizedBuildSupport_ = optimizedBuildSupport;
 	}
 
+    void RunCoverageSettings::SetFilenamesCacheDirectory(const std::string& directory)
+	{
+		filenamesDirectoryCache_ = directory;
+	}
+
 	//-------------------------------------------------------------------------
 	const StartInfo& RunCoverageSettings::GetStartInfo() const
 	{
@@ -126,5 +131,11 @@ namespace CppCoverage
 	const std::vector<SubstitutePdbSourcePath>& RunCoverageSettings::GetSubstitutePdbSourcePaths() const
 	{
 		return substitutePdbSourcePath_;
+	}
+
+	//-------------------------------------------------------------------------
+	std::string RunCoverageSettings::GetFilenamesDirectoryCache() const
+	{
+		return filenamesDirectoryCache_;
 	}
 }

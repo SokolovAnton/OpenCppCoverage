@@ -19,6 +19,8 @@
 #include <filesystem>
 
 #include "CppCoverageExport.hpp"
+#include "IModuleSourceFilenamesCache.hpp"
+#include "IDebugInformationHandler.hpp"
 #include "SubstitutePdbSourcePath.hpp"
 
 struct IDiaSession;
@@ -28,39 +30,10 @@ struct IDiaSourceFile;
 namespace CppCoverage
 {
 	//-------------------------------------------------------------------------
-	class IDebugInformationHandler
-	{
-	  public:
-		struct Line
-		{
-			Line(unsigned long lineNumber,
-			     int64_t virtualAddress,
-			     unsigned long symbolIndex)
-			    : lineNumber_{lineNumber},
-			      virtualAddress_{virtualAddress},
-			      symbolIndex_{symbolIndex}
-			{
-			}
-			Line(const Line&) = default;
-
-			Line& operator=(const Line&) = default;
-
-			unsigned long lineNumber_;
-			unsigned long symbolIndex_;
-			int64_t virtualAddress_;
-		};
-
-		virtual ~IDebugInformationHandler() = default;
-		virtual bool IsSourceFileSelected(const std::filesystem::path&) = 0;
-		virtual void OnSourceFile(const std::filesystem::path&,
-		                          const std::vector<Line>&) = 0;
-	};
-
-	//-------------------------------------------------------------------------
 	class CPPCOVERAGE_DLL DebugInformationEnumerator
 	{
 	  public:
-		explicit DebugInformationEnumerator(const std::vector<SubstitutePdbSourcePath>&);
+		DebugInformationEnumerator(const std::vector<SubstitutePdbSourcePath>&, IModuleSourceFilenamesCache&);
 		bool Enumerate(const std::filesystem::path&,
 		               IDebugInformationHandler&);
 
@@ -75,5 +48,7 @@ namespace CppCoverage
 
 		std::vector<IDebugInformationHandler::Line> lines_;
 		const std::vector<SubstitutePdbSourcePath> substitutePdbSourcePaths_;
+
+		IModuleSourceFilenamesCache& linesCache_;
 	};
 }

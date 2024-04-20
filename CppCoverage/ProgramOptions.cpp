@@ -77,6 +77,7 @@ namespace CppCoverage
 				("A output path of " + ExportOptionParser::ExportTypeOption + "=" + ExportOptionParser::ExportTypeBinaryValue +
 				". This coverage data will be merged with the current one. Can have multiple occurrences.").c_str())
 				(ProgramOptions::WorkingDirectoryOption.c_str(), po::value<std::string>(), "The program working directory.")
+				(ProgramOptions::FilenamesCacheDirectory.c_str(), po::value<std::string>(), "Modules filenames cache directory")
 				(ProgramOptions::CoverChildrenOption.c_str(), "Enable code coverage for children processes.")
 				(ProgramOptions::NoAggregateByFileOption.c_str(), "Do not aggregate coverage for same file path.")
                 (ProgramOptions::StopOnAssertOption.c_str(), "Do not continue after DebugBreak() or assert().")
@@ -118,6 +119,7 @@ namespace CppCoverage
 	const std::string ProgramOptions::HelpShortOption = "h";
 	const std::string ProgramOptions::ConfigFileOption = "config_file";	
 	const std::string ProgramOptions::WorkingDirectoryOption = "working_dir";
+	const std::string ProgramOptions::FilenamesCacheDirectory = "filenames_cache_dir";
 	const std::string ProgramOptions::CoverChildrenOption = "cover_children";
 	const std::string ProgramOptions::NoAggregateByFileOption = "no_aggregate_by_file";
 	const std::string ProgramOptions::ProgramToRunOption = "programToRun";

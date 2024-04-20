@@ -453,6 +453,11 @@ namespace CppCoverage
 		AddExcludedLineRegexes(variablesMap, options);
 		AddSubstitutePdbSourcePaths(variablesMap, options);
 
+		auto oFilenamesCacheDirectory =
+			variablesMap.GetOptionalValue<std::string>(ProgramOptions::FilenamesCacheDirectory);
+		if (oFilenamesCacheDirectory)
+			options.SetFilenamesCacheDirectory(*oFilenamesCacheDirectory);
+
 		if (!options.GetStartInfo() && options.GetInputCoveragePaths().empty())
 			throw Plugin::OptionsParserException(
 			    "You must specify a program to execute or use --" +

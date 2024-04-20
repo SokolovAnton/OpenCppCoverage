@@ -136,6 +136,17 @@ namespace CppCoverage
 	}
 
     //-------------------------------------------------------------------------
+	void Options::SetFilenamesCacheDirectory(const std::string& directory)
+	{
+		filenamesDirectoryCache_ = directory;
+	}
+
+	std::string Options::GetFilenamesCacheDirectory() const
+	{
+		return filenamesDirectoryCache_;
+	}
+
+    //-------------------------------------------------------------------------
     void Options::EnableStopOnAssertMode()
     {
       isStopOnAssertModeEnabled_ = true;

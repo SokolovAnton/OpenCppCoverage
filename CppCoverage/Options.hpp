@@ -70,6 +70,9 @@ namespace CppCoverage
 		void EnableContinueAfterCppExceptionMode();
 		bool IsContinueAfterCppExceptionModeEnabled() const;
 
+		void SetFilenamesCacheDirectory(const std::string&);
+		std::string GetFilenamesCacheDirectory() const;
+
 		void AddExport(OptionsExport&&);
 		const std::vector<OptionsExport>& GetExports() const;
 		
@@ -111,5 +114,6 @@ namespace CppCoverage
 		std::vector<UnifiedDiffSettings> unifiedDiffSettingsCollection_;
 		std::vector<std::wstring> excludedLineRegexes_;
 		std::vector<SubstitutePdbSourcePath> substitutePdbSourcePaths_;
+		std::string filenamesDirectoryCache_;
 	};
 }

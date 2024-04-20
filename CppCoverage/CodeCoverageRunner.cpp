@@ -36,12 +36,24 @@
 #include "MonitoredLineRegister.hpp"
 #include "FilterAssistant.hpp"
 #include "FileSystem.hpp"
+#include "IModuleSourceFilenamesCache.hpp"
+
+#include "DummyModuleSourceFilenamesCache.hpp"
+#include "LevelDbModuleSourceFilenamesCache.hpp"
 
 #include "Tools/WarningManager.hpp"
 #include "Tools/Tool.hpp"
 
 namespace CppCoverage
 {
+    std::unique_ptr<IModuleSourceFilenamesCache> createFilenamesCache(const std::string& directory)
+    {
+        if (directory.empty())
+           return std::make_unique<DummyModuleSourceFilenamesCache>();
+
+        return std::make_unique<LevelDbModuleSourceFilenamesCache>(directory);
+    }
+
 	//-------------------------------------------------------------------------
 	CodeCoverageRunner::CodeCoverageRunner(
 	    std::shared_ptr<Tools::WarningManager> warningManager)
@@ -71,11 +83,13 @@ namespace CppCoverage
 			settings.GetExcludedLineRegexes(),
 			settings.GetOptimizedBuildSupport());
 
+		auto filenamesCacheDirectory = settings.GetFilenamesDirectoryCache();
+		auto linesCache = createFilenamesCache(settings.GetFilenamesDirectoryCache());
 		monitoredLineRegister_ = std::make_unique<MonitoredLineRegister>(
 		    breakpoint_,
 		    executedAddressManager_,
 		    coverageFilterManager_,
-		    std::make_unique<DebugInformationEnumerator>(settings.GetSubstitutePdbSourcePaths()),
+		    std::make_unique<DebugInformationEnumerator>(settings.GetSubstitutePdbSourcePaths(), *linesCache),
 			filterAssistant_);
 
 		const auto& startInfo = settings.GetStartInfo();

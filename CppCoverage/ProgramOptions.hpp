@@ -40,6 +40,7 @@ namespace CppCoverage
 		static const std::string HelpShortOption;
 		static const std::string ConfigFileOption;
 		static const std::string WorkingDirectoryOption;
+		static const std::string FilenamesCacheDirectory;
 		static const std::string CoverChildrenOption;
 		static const std::string NoAggregateByFileOption;
         static const std::string StopOnAssertOption;

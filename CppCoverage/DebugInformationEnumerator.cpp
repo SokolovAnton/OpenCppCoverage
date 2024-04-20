@@ -214,8 +214,9 @@ namespace CppCoverage
 
 	//--------------------------------------------------------------------------
 	DebugInformationEnumerator::DebugInformationEnumerator(
-	    const std::vector<SubstitutePdbSourcePath>& substitutePdbSourcePaths)
-		: substitutePdbSourcePaths_{ substitutePdbSourcePaths }
+	    const std::vector<SubstitutePdbSourcePath>& substitutePdbSourcePaths, IModuleSourceFilenamesCache& linesCache)
+		: substitutePdbSourcePaths_{ substitutePdbSourcePaths },
+		  linesCache_{linesCache}
 	{
 	}
 
@@ -233,20 +234,60 @@ namespace CppCoverage
 		if (sourcePtr->openSession(&sessionPtr) != S_OK || !sessionPtr)
 			THROW("DIA: Cannot open session.");
 
+		auto sourceFileNamesToCache = std::vector<std::wstring>{};
+
+        const auto enumerateSourceFileLines =
+          [&](IDiaSourceFile& sourceFile) {
+          auto filename = GetSourceFileName(sourceFile);
+          if (handler.IsSourceFileSelected(filename))
+          {
+            lines_.clear();
+            EnumLines(*sessionPtr, sourceFile, handler);
+            handler.OnSourceFile(filename, lines_);
+
+			if (!lines_.empty())
+			{
+			  auto fileName = BSTR{};
+			  sourceFile.get_fileName(&fileName);
+			  sourceFileNamesToCache.emplace_back(std::wstring{ fileName, SysStringLen(fileName) });
+			}
+          }};
+
+	    auto oCachedFileNamesToCover = linesCache_.ReadCachedFileNames(path);
+		if (oCachedFileNamesToCover)
+		{
+		  for (const auto& fileName : *oCachedFileNamesToCover)
+		  {
+			auto pSourceFile = CComPtr<IDiaSourceFile>{};
+
+			auto files = CComPtr<IDiaEnumSourceFiles>{};
+			auto result = sessionPtr->findFile(NULL, fileName.c_str(), nsNone, &files);
+
+			if (SUCCEEDED(result))
+			{
+			  LOG_INFO << "Read symbols for cached filename: " << fileName;
+			  EnumerateCollection<IDiaSourceFile>(*files, enumerateSourceFileLines);
+			}
+			else
+			{
+			  LOG_ERROR << "Cannot find file by name = " << fileName;
+			}
+		  }
+
+		  return true;
+		}
+
 		auto sourceFiles = GetEnumSourceFiles(*sessionPtr);
 		if (!sourceFiles)
 			THROW("DIA: cannot get SourceFiles");
 
-		EnumerateCollection<IDiaSourceFile>(
-		    *sourceFiles, [&](IDiaSourceFile& sourceFile) {
-			    auto filename = GetSourceFileName(sourceFile);
-			    if (handler.IsSourceFileSelected(filename))
-			    {
-				    lines_.clear();
-				    EnumLines(*sessionPtr, sourceFile, handler);
-				    handler.OnSourceFile(filename, lines_);
-			    }
-		    });
+
+        EnumerateCollection<IDiaSourceFile>(
+          *sourceFiles, enumerateSourceFileLines
+        );
+
+		linesCache_.CacheFileNames(path, sourceFileNamesToCache);
+
 		return true;
 	}
 

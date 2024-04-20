@@ -44,6 +44,7 @@ namespace CppCoverage
         void SetStopOnAssert(bool);
         void SetMaxUnmatchPathsForWarning(size_t);
 		void SetOptimizedBuildSupport(bool);
+		void SetFilenamesCacheDirectory(const std::string&);
 
 		const StartInfo& GetStartInfo() const;
 		const CoverageFilterSettings& GetCoverageFilterSettings() const;
@@ -55,6 +56,7 @@ namespace CppCoverage
 		bool GetOptimizedBuildSupport() const;
 		const std::vector<std::wstring>& GetExcludedLineRegexes() const;
 		const std::vector<SubstitutePdbSourcePath>& GetSubstitutePdbSourcePaths() const;
+		std::string GetFilenamesDirectoryCache() const;
 
 	private:
 		StartInfo startInfo_;
@@ -67,5 +69,6 @@ namespace CppCoverage
 		bool optimizedBuildSupport_;
 		std::vector<std::wstring> excludedLineRegexes_;
 		std::vector<SubstitutePdbSourcePath> substitutePdbSourcePath_;
+		std::string filenamesDirectoryCache_;
 	};
 }
